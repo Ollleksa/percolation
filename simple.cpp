@@ -7,7 +7,7 @@
 
 using namespace std;
 
-const int N = 10;
+const int N = 20;
 
 class material
 {
@@ -25,6 +25,7 @@ class material
         }
 
         void show();
+        void show2();
         void iter();
         void unite(int value, int i, int j);
         int check();
@@ -59,6 +60,24 @@ void material::show()
         myfile.close();
 }
 
+void material::show2()
+{
+	ofstream myfile;
+	char filename[256];
+	sprintf(filename,"data/check%d.dat",coun);
+	myfile.open(filename);
+	for(int x = 0; x < N; x++)
+	{
+		for(int y = 0; y < N; y++)
+                {
+                    myfile << M[x][y] << "\t";
+                }
+                myfile << "\n";
+	}
+        myfile.close();
+}
+
+
 void material::iter()
 {
     int x, y;
@@ -90,10 +109,11 @@ void material::iter()
 
 void material::unite(int value, int i, int j)
 {
+    int temp = M[i][j];
     for(int k = 0; k < N; k++)
         for(int l = 0; l < N; l++)
         {
-            if(M[k][l] == M[i][j])
+            if(M[k][l] == temp)
             {
                 M[k][l] = value;
             }
@@ -105,29 +125,44 @@ int material::check()
     int ch = 0;
 
     for(int i = 0; i < N; i++)
+    {
         for(int j = 0; j < N; j++)
-            if(M[0][i] == M[N-1][j])
-                if(M[0][i] > 0)
+        {
+            if(M[0][i] == M[N-1][j] && M[0][i] > 0)
                     ch = 1;
+        }
+    }
 
     return ch;
 }
 
 int main()
 {
-    material one;
-    int i = 0;
-
+    int Exp = 1000;
+    int it = 0;
     srand (time(NULL));
-    while(one.check() == 0 )
-    //while(i < 100)
+
+    material pic;
+    while(pic.check() == 0 )
     {
-        one.iter();
-        cout << one.res() << endl;
-        i++;
+        pic.iter();
+        pic.show();
     }
 
-    one.show();
-    cout << "It take " << one.res() << " iterations" << endl;
+    for(int k = 0; k < Exp; k++)
+    {
+        material one;
+        while(one.check() == 0 )
+        {
+            one.iter();
+        }
+
+        it = it + one.res();
+        cout << "It take " << one.res() << " iterations" << endl;
+    }
+
+    double coef;
+    coef = static_cast<double>(it)/(N*N*Exp);
+    cout << "Average coefficient " << coef << endl;
     return 1;
 }
